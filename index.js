@@ -24,7 +24,7 @@ function mainMenu() {
             choices: [
                 {
                     name: "View Employees",
-                    value: "View_Employees"
+                    value: "VIEW_EMPLOYEES"
                 },
                 {
                     name: "View Departments",
@@ -54,8 +54,8 @@ function mainMenu() {
         }
     ]).then(res => {
         // The below swtich case checks the selected answer to the above prompt, based on the value of the selected, it initiates the appropriate function
-        switch (res.choice) {
-            case "View_Employees":
+        switch (res.initialChoice) {
+            case "VIEW_EMPLOYEES":
                 viewEmployee();
                 break;
             case "View_Departments":
@@ -89,6 +89,7 @@ function viewEmployee(){
             console.table(results)
         }
     );
+    mainMenu();
 };
 
 function viewDepartment(){
