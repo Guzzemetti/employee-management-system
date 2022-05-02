@@ -14,6 +14,7 @@ connection.connect(function (err){
     if (err) throw err;
 });
 
+// Initial prompt, requiring users to select what functions they wish to perform
 function mainMenu() {
     prompt([
         {
@@ -52,6 +53,7 @@ function mainMenu() {
             ]
         }
     ]) .then(res => {
+        // The below swtich case checks the selected answer to the above prompt, based on the value of the selected, it initiates the appropriate function
         switch(res.choice) {
             case "View_Employees":
             viewEmployee();
@@ -98,3 +100,6 @@ function quit() {
     console.log("Byeeeeee");
     process.exit;
 };
+
+
+mainMenu();
