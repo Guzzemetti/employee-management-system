@@ -1,3 +1,5 @@
+// Need to make helper functions in separate files
+const helpers = require("./helpers/dbHelpers");
 const mysql = require("mysql2");
 const { prompt } = require("inquirer");
 // const db = require("./db");
@@ -14,6 +16,8 @@ connection.connect(function (err) {
     if (err) throw err;
 });
 
+// WHEN I start the application
+// THEN I am presented with the following options: view all departments, view all roles, view all employees, add a department, add a role, add an employee, and update an employee role
 // Initial prompt, requiring users to select what functions they wish to perform
 function mainMenu() {
     prompt([
@@ -51,8 +55,10 @@ function mainMenu() {
                     value: "Quit"
                 }
             ]
+            
         }
-    ]).then(res => {
+    ]
+    ).then(res => {
         // The below swtich case checks the selected answer to the above prompt, based on the value of the selected, it initiates the appropriate function
         switch (res.initialChoice) {
             case "VIEW_EMPLOYEES":
@@ -81,24 +87,34 @@ function mainMenu() {
     )
 };
 
+// TODO: Add managers to employee list to display in this function
 function viewEmployee(){
-    connection.query('SELECT * FROM employees_db.employees', (err, results) => {
+    console.log("\n")
+    connection.query('SELECT employees.first_name AS "First Name", employees.last_name AS "Last Name", roles.title AS "Title", roles.salary AS "Salary" FROM employees JOIN roles ON employees.role_id = roles.id', (err, results) => {
             if(err){
                 console.log(err);
             }
+            console.log("\n")
             console.table(results)
         }
     );
     mainMenu();
 };
 
+// WHEN I choose to view all departments
+// THEN I am presented with a formatted table showing department names and department ids
 function viewDepartment(){
 
 };
 
+// WHEN I choose to view all roles
+// THEN I am presented with the job title, role id, the department that role belongs to, and the salary for that role
 function viewRoles(){
     
 };
+
+// WHEN I choose to add an employee
+// THEN I am prompted to enter the employee’s first name, last name, role, and manager, and that employee is added to the database
 
 function addEmployee(){
     prompt([
@@ -115,6 +131,8 @@ function addEmployee(){
     ]).then(addDepartment())
 };
 
+// WHEN I choose to add a department
+// THEN I am prompted to enter the name of the department and that department is added to the database
 function addDepartment(){
     prompt([
         {
@@ -126,6 +144,8 @@ function addDepartment(){
     ]).then(updateRole())
 };
 
+// WHEN I choose to update an employee role
+// THEN I am prompted to select an employee to update and their new role and this information is updated in the database 
 function updateRole(){
     prompt([
         {
@@ -137,11 +157,14 @@ function updateRole(){
     ]).then(mainMenu())
 };
 
+// WHEN I choose to add a role
+// THEN I am prompted to enter the name, salary, and department for the role and that role is added to the database
+// NEED ADD ROLE FUNCTION
 
 
 function quit() {
     console.log("Byeeeeee");
-    process.exit;
+    process.exit();
 };
 
 
