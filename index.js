@@ -22,7 +22,7 @@ console.log(art)
 function mainMenu() {
     prompt([
         {
-            type: "rawlist",
+            type: "list",
             name: "initialChoice",
             message: "What would you like to do?",
             choices: [
@@ -91,7 +91,7 @@ function mainMenu() {
 // Function that displays all employees, their names, titles, departments and salaries
 function viewEmployee() {
     console.log("\n")
-    connection.query('SELECT employees.first_name AS "First Name", employees.last_name AS "Last Name", roles.title AS "Title", roles.salary AS "Salary" FROM employees JOIN roles ON employees.role_id = roles.id', (err, results) => {
+    connection.query('SELECT employees.id AS "ID", employees.first_name AS "First Name", employees.last_name AS "Last Name", roles.title AS "Title", roles.salary AS "Salary" FROM employees JOIN roles ON employees.role_id = roles.id', (err, results) => {
         if (err) {
             console.log(err);
         }
@@ -133,52 +133,84 @@ function viewRoles() {
     mainMenu();
 };
 
-// WHEN I choose to add an employee
-// THEN I am prompted to enter the employee’s first name, last name, role, and manager, and that employee is added to the database
-
+// Function that promps the user to enter the employee’s first name, last name, role, and manager, and that employee is added to the database
 function addEmployee() {
-    prompt([
-        {
-            type: "input",
-            name: "firstName",
-            message: "Please enter the new associates's First name:"
-        },
-        {
-            type: "input",
-            name: "lastName",
-            message: "Please enter the associate's Last Name:"
-        }
-    ])
-};
-
-// WHEN I choose to add a department
-// THEN I am prompted to enter the name of the department and that department is added to the database
-function addDepartment() {
-    let deptarmentList = [];
-    let dbDepts = connection.query('SELECT * FROM departments');
-    console.log(dbDepts);
-    deptTable = deptarmentList.push(dbDepts);
+    let roleList = connection.query('SELECT * FROM roles', (err, answers) => {
+        if (err) throw err;
         prompt([
             {
+                type: "input",
+                name: "firstName",
+                message: "Please enter the new associates's First name:"
+            },
+            {
+                type: "input",
+                name: "lastName",
+                message: "Please enter the associate's Last Name:"
+            },
+            {
                 type: "list",
-                name: "departmentList",
-                message: "Please select the department this associate works with:",
-                choices: [deptTable, "Add Department"]
+                name: "role",
+                message: "Please select this associate's job title:",
+                choices:
+                    answers.map((roleList) => {
+                        return {
+                            name: roleList.title,
+                            value: roleList.ids
+                        }
+                    })
             }
-        ])
-    };
+        ]).then(answers => {
+            connection.query(`INSERT INTO employees (first_name, last_name, role_id) VALUES ("${answers.firstName}", "${answers.lastName}", ${answers.role})`),
+                console.log("Employee added successfully!")
+            mainMenu();
+        })
+    })
+};
 
-// WHEN I choose to update an employee role
-// THEN I am prompted to select an employee to update and their new role and this information is updated in the database 
-function updateRole() {
+// Function that prompts the user to enter the name of the department and that department is added to the database
+function addDepartment() {
     prompt([
         {
-            type: "list",
-            name: "roleList",
-            message: "Please select the associate's role:",
-            choices: ["Associate Relations Coordinator", "Community Relations Manager", "Claims Adjuster", "Sustainability Coordinator", "Add Role"]
+            type: "input",
+            name: "addDept",
+            message: "Please type the name of the department you wish to add:",
         }
-    ]).then(mainMenu())
+    ]).then((answers) => {
+        let newDept = answers.addDept;
+        connection.query(`INSERT INTO departments (name) VALUES ("${newDept}")`),
+            console.log("Department added successfully!")
+        mainMenu();
+    })
+};
+// THEN I am prompted to select an employee to update and their new role and this information is updated in the database 
+function updateRole() {
+    let roleList = connection.query('SELECT * FROM roles', (err, answers) => {
+        if (err) throw err;
+        prompt([
+            {
+                type: "input",
+                name: "empId",
+                message: "Please enter the ID of the associate you wish to update:",
+            },
+            {
+                type: "list",
+                name: "newRole",
+                message: "Please select this associate's new role:",
+                choices:
+                    answers.map((roleList) => {
+                        return {
+                            name: roleList.title,
+                            value: roleList.id
+                        }
+                    })
+            }
+        ]).then((answers) => {
+        let employeeID = answers.empId
+        connection.query(`UPDATE employees SET role_id = "${answers.newRole}" WHERE id = ${answers.empId}`)
+        mainMenu()
+    })
+    });
 };
 
 // WHEN I choose to add a role
