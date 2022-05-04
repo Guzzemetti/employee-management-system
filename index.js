@@ -213,17 +213,16 @@ function updateRole() {
                     })
             }
         ]).then((answers) => {
-        connection.query(`UPDATE employees SET role_id = "${answers.newRole}" WHERE id = ${answers.empId}`)
+        let newRole = answers.newRole;
+        let empID = answers.empId;
+        connection.query(`UPDATE employees SET role_id = "${newRole}" WHERE id = ${empID}`)
         console.log("Employee updated successfully!")
         mainMenu()
-    })
+    });
     });
 };
 
-// WHEN I choose to add a role
-// THEN I am prompted to enter the name, salary, and department for the role and that role is added to the database
-// NEED ADD ROLE FUNCTION
-
+// Function that prompts users to enter the name, salary, and department for the role and that role is added to the database
 function addRole() {
     let deptList = connection.query('SELECT * FROM departments', (err, answers) => {
         if (err) throw err;
