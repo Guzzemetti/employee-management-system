@@ -47,6 +47,10 @@ function mainMenu() {
                     value: "Add_Department"
                 },
                 {
+                    name: "Add Role",
+                    value: "Add_Role"
+                },
+                {
                     name: "Update Employee Role",
                     value: "Update_Role"
                 },
@@ -75,6 +79,9 @@ function mainMenu() {
                 break;
             case "Add_Department":
                 addDepartment();
+                break;
+            case "Add_Role":
+                addRole();
                 break;
             case "Update_Role":
                 updateRole();
@@ -162,7 +169,7 @@ function addEmployee() {
             }
         ]).then(answers => {
             connection.query(`INSERT INTO employees (first_name, last_name, role_id) VALUES ("${answers.firstName}", "${answers.lastName}", ${answers.role})`),
-                console.log("Employee added successfully!")
+            console.log("Employee added successfully!")
             mainMenu();
         })
     })
@@ -206,8 +213,8 @@ function updateRole() {
                     })
             }
         ]).then((answers) => {
-        let employeeID = answers.empId
         connection.query(`UPDATE employees SET role_id = "${answers.newRole}" WHERE id = ${answers.empId}`)
+        console.log("Employee updated successfully!")
         mainMenu()
     })
     });
@@ -216,6 +223,45 @@ function updateRole() {
 // WHEN I choose to add a role
 // THEN I am prompted to enter the name, salary, and department for the role and that role is added to the database
 // NEED ADD ROLE FUNCTION
+
+function addRole() {
+    let deptList = connection.query('SELECT * FROM departments', (err, answers) => {
+        if (err) throw err;
+            prompt([
+                {
+                    type: "input",
+                    name: "addRole",
+                    message: "Please enter the Job Title you wish to add:"
+                },
+                {
+                    type: "list",
+                    name: "deptNum",
+                    message: "Please select the Department that this role belongs to:",
+                    choices: 
+                        answers.map((deptList) => {
+                            return {
+                                name: deptList.name,
+                                value: deptList.id
+                            }
+                        })
+                },
+                {
+                    type: "number",
+                    name: "addSalary",
+                    message: "Please enter the Salary amount for this role:"
+                }
+            ]).then((answers) => {
+                let newRole = answers.addRole;
+                let newSalary = answers.addSalary;
+                let deptID = answers.deptNum;
+                connection.query(`INSERT INTO roles (title, salary, departments_id) VALUES ("${newRole}", ${newSalary}, ${deptID})`),
+                console.log("Role added successfully!")
+                mainMenu();
+        })
+    })
+};
+
+
 
 
 function quit() {
