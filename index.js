@@ -1,9 +1,8 @@
-// Need to make helper functions in separate files
 const helpers = require("./helpers/dbHelpers");
 const mysql = require("mysql2");
 const { prompt } = require("inquirer");
-// const db = require("./db");
-// const cTable = require("console.table");
+const art = require("./helpers/dbHelpers");
+const cTable = require("console.table");
 
 const connection = mysql.createConnection({
     host: "localhost",
@@ -16,13 +15,14 @@ connection.connect(function (err) {
     if (err) throw err;
 });
 
-// WHEN I start the application
-// THEN I am presented with the following options: view all departments, view all roles, view all employees, add a department, add a role, add an employee, and update an employee role
-// Initial prompt, requiring users to select what functions they wish to perform
+// ascii art for app title
+console.log(art)
+
+// Initial prompt, prompting users with the following options: view all departments, view all roles, view all employees, add a department, add a role, add an employee, and update an employee role
 function mainMenu() {
     prompt([
         {
-            type: "list",
+            type: "rawlist",
             name: "initialChoice",
             message: "What would you like to do?",
             choices: [
@@ -97,6 +97,7 @@ function viewEmployee() {
         }
         console.log("\n")
         console.table(results)
+        console.log("\n")
     }
     );
     mainMenu();
@@ -105,12 +106,13 @@ function viewEmployee() {
 // Function that presents user with a formatted table showing department names and department ids
 function viewDepartment() {
     console.log("\n")
-    connection.query('SELECT departments.name AS "Department Name", departments.id AS "Department ID" from departments', (err, results) => {
+    connection.query('SELECT departments.name AS "Department Name", departments.id AS "Department ID" FROM  departments ORDER BY id ASC', (err, results) => {
         if (err) {
             console.log(err);
         }
         console.log("\n")
         console.table(results)
+        console.log("\n")
     }
     );
     mainMenu();
@@ -119,12 +121,13 @@ function viewDepartment() {
 // Function that presents users with the job title, role id, the department that role belongs to, and the salary for that role
 function viewRoles() {
     console.log("\n")
-    connection.query('SELECT roles.id AS "Role ID", roles.title AS "Job Title", departments.name AS "Department", roles.salary AS "Salary" FROM roles JOIN departments ON roles.departments_id = departments.id', (err, results) => {
+    connection.query('SELECT roles.id AS "Role ID", roles.title AS "Job Title", departments.name AS "Department", roles.salary AS "Salary" FROM roles JOIN departments ON roles.departments_id = departments.id ORDER BY roles.id ASC', (err, results) => {
         if (err) {
             console.log(err);
         }
         console.log("\n")
         console.table(results)
+        console.log("\n")
     }
     );
     mainMenu();
@@ -145,21 +148,25 @@ function addEmployee() {
             name: "lastName",
             message: "Please enter the associate's Last Name:"
         }
-    ]).then(addDepartment())
+    ])
 };
 
 // WHEN I choose to add a department
 // THEN I am prompted to enter the name of the department and that department is added to the database
 function addDepartment() {
-    prompt([
-        {
-            type: "list",
-            name: "departmentList",
-            message: "Please select the department this associate works with:",
-            choices: ["Human Resources", "Public Affairs", "Risk Management", "Sustainability", "Add Department"]
-        }
-    ]).then(updateRole())
-};
+    let deptarmentList = [];
+    let dbDepts = connection.query('SELECT * FROM departments');
+    console.log(dbDepts);
+    deptTable = deptarmentList.push(dbDepts);
+        prompt([
+            {
+                type: "list",
+                name: "departmentList",
+                message: "Please select the department this associate works with:",
+                choices: [deptTable, "Add Department"]
+            }
+        ])
+    };
 
 // WHEN I choose to update an employee role
 // THEN I am prompted to select an employee to update and their new role and this information is updated in the database 
