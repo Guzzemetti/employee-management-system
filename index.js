@@ -163,15 +163,15 @@ function addEmployee() {
                     answers.map((roleList) => {
                         return {
                             name: roleList.title,
-                            value: roleList.ids
+                            value: roleList.id
                         }
                     })
             }
         ]).then(answers => {
-            connection.query(`INSERT INTO employees (first_name, last_name, role_id) VALUES ("${answers.firstName}", "${answers.lastName}", ${answers.role})`),
+            connection.query(`INSERT INTO employees (first_name, last_name, role_id) VALUES ("${answers.firstName}", "${answers.lastName}", ${answers.role})`)
             console.log("Employee added successfully!")
-            mainMenu();
-        })
+            mainMenu()
+        });
     })
 };
 
@@ -187,8 +187,8 @@ function addDepartment() {
         let newDept = answers.addDept;
         connection.query(`INSERT INTO departments (name) VALUES ("${newDept}")`),
             console.log("Department added successfully!")
-        mainMenu();
-    })
+        mainMenu()
+    });
 };
 // THEN I am prompted to select an employee to update and their new role and this information is updated in the database 
 function updateRole() {
